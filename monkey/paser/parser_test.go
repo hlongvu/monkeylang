@@ -69,7 +69,7 @@ func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
 	ident, ok := exp.(*ast.Identifier)
 
 	if !ok {
-		t.Fatalf("exp is not Identifier, got %T", exp)
+		t.Fatalf("exp is not Identifier, got %T : %+v", exp, exp)
 		return false
 	}
 

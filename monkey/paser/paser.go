@@ -69,6 +69,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
+	p.registerInfix(token.LPAREN, p.parseCallExpression)
 
 	p.NextToken()
 	p.NextToken()
@@ -311,7 +312,6 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	p.NextToken()
 
 	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF){
-		fmt.Printf("Curtoken is : %s", p.curToken.Literal)
 		stmt := p.parseStatement()
 		if stmt != nil {
 			block.Statements = append(block.Statements, stmt)
@@ -375,4 +375,36 @@ func (p *Parser) parseFuctionParameters() []*ast.Identifier{
 		return nil
 	}
 	return ids
+}
+
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression{
+	fmt.Print("Parsing call expression \n")
+	exp:= &ast.CallExpression{Token: p.curToken, Function: function}
+	exp.Arguments = p.parseCallArguments()
+	return exp
+}
+
+func (p *Parser) parseCallArguments() []ast.Expression{
+	args := []ast.Expression{}
+
+	if p.peekTokenIs(token.RPAREN){
+		p.NextToken()
+		return args
+	}
+	p.NextToken()
+
+	new_arg := p.parseExpression(LOWEST)
+	args = append(args, new_arg)
+
+	for p.peekTokenIs(token.COMMA){
+		p.NextToken()
+		p.NextToken()
+		new_arg = p.parseExpression(LOWEST)
+		args = append(args, new_arg)
+	}
+
+	if !p.expectPeek(token.RPAREN){
+		return nil
+	}
+	return args
 }

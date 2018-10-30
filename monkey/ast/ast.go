@@ -226,7 +226,7 @@ func (c *CallExpression) String() string {
 
 	out.WriteString(c.Function.String())
 	out.WriteString("(")
-	out.WriteString(strings.Join(arguments, ","))
+	out.WriteString(strings.Join(arguments, ", "))
 	out.WriteString(")")
 	return out.String()
 }

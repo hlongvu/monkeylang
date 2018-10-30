@@ -1,37 +1,33 @@
 package paser
 
 import (
-	"github.com/hlongvu/monkeylang/monkey/ast"
 	"github.com/hlongvu/monkeylang/monkey/lexer"
 	"testing"
 )
 
 func TestReturnStatement(t *testing.T) {
-	input := `
-	return 5;
-	return 10;
-	return 10000;
-`
-
-	l := lexer.New(input)
-	p := New(l)
-	program := p.ParseProgram()
-	checkParserErrors(t, p)
-
-	if len(program.Statements) != 3 {
-		t.Fatalf("program.Statements not contain 3 statements. Got %d", len(program.Statements))
+	tests := []struct {
+		input         string
+		expectedValue interface{}
+	}{
+		{"return 5;", 5},
+		{"return x;", "x"},
 	}
 
-	for _, stmt := range program.Statements {
-		returnStmt, ok := stmt.(*ast.ReturnStatement)
-		if !ok {
-			t.Errorf("stmt is not ReturnStatement. Got %T", stmt)
-			continue
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements not contain 1 statements. Got %d", len(program.Statements))
 		}
 
-		if returnStmt.TokenLiteral() != "return" {
-			t.Errorf("returnStmt.TokenLiteral is not return, got %s", returnStmt.TokenLiteral())
-		}
+		stmt := program.Statements[0]
 
+		if !testReturnStatement(t, stmt, tt.expectedValue){
+			return
+		}
 	}
 }

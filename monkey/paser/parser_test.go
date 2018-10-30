@@ -31,6 +31,25 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	return true
 }
 
+func testReturnStatement(t *testing.T, s ast.Statement, name interface{})bool{
+	if s.TokenLiteral() != "return" {
+		t.Errorf("s.TokenLiteral is not return, got '%s'", s.TokenLiteral())
+		return false
+	}
+
+	letStmt, ok := s.(*ast.ReturnStatement)
+
+	if !ok {
+		t.Errorf("s not ReturnStatement, got %T", s)
+		return false
+	}
+
+	if !testLiteralExpression(t, letStmt.ReturnValue, name){
+		return false
+	}
+	return true
+}
+
 func checkParserErrors(t *testing.T, p *Parser) {
 	errors := p.Errors()
 	if len(errors) == 0 {

@@ -133,8 +133,9 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
-
-	for !p.curTokenIs(token.SEMICOLON) {
+	p.NextToken()
+	stmt.Value = p.parseExpression(LOWEST)
+	if p.peekTokenIs(token.SEMICOLON){
 		p.NextToken()
 	}
 	return stmt
@@ -176,7 +177,11 @@ func (p *Parser) curPrecedence() int {
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.curToken}
 	p.NextToken()
-	for !p.curTokenIs(token.SEMICOLON) {
+	//for !p.curTokenIs(token.SEMICOLON) {
+	//	p.NextToken()
+	//}
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+	if p.peekTokenIs(token.SEMICOLON){
 		p.NextToken()
 	}
 	return stmt
@@ -378,7 +383,7 @@ func (p *Parser) parseFuctionParameters() []*ast.Identifier{
 }
 
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression{
-	fmt.Print("Parsing call expression \n")
+	//fmt.Print("Parsing call expression \n")
 	exp:= &ast.CallExpression{Token: p.curToken, Function: function}
 	exp.Arguments = p.parseCallArguments()
 	return exp
